@@ -33,15 +33,28 @@ public class ImageController {
             directory.mkdirs();
         }
 
-        //파일명은 userID로 설정
-        String fileName = userID + "_" + imageFile.getOriginalFilename();
+        //이미지 파일의 원본 파일 이름
+        String originalFileName = imageFile.getOriginalFilename();
 
-        //이미지를 저장할 경로 설정
-        Path uploadPath = Paths.get(uploadDir + fileName);
+        //이미지 파일 확장자 추출
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
         try{
+            //이미지 ID 생성
+            String imageID = userID + "_" + System.currentTimeMillis(); //현재 시간을 사용하여 고유한 ID 생성
+
+            // 파일명은 이미지 ID + 확장자로 설정
+            String fileName = imageID + fileExtension;
+
+            //이미지 저장할 경로 설정
+            Path uploadPath = Paths.get(uploadDir+fileName);
+
             //이미지 디스크에 저장
             Files.write(uploadPath, imageFile.getBytes());
+
+            //MySQL에 저장
+            imageService.saveImage(imageID, userID, uploadPath.toString());
+
         } catch (IOException e){
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Failed to upload");
