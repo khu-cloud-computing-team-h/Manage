@@ -54,8 +54,8 @@ public class ImageController {
 
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Failed to upload image");
+            return ResponseEntity.badRequest().body("Image upload Fail");
         }
-        return ResponseEntity.ok("Image uploaded successfully!");
+        return ResponseEntity.ok("Image upload success");
     }
 }
