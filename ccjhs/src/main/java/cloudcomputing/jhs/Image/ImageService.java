@@ -1,6 +1,7 @@
 package cloudcomputing.jhs.Image;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,5 +28,19 @@ public class ImageService {
     public Image getImageById(Long imageID) {
         Optional<Image> image = imageRepository.findById(imageID);
         return image.orElse(null);
+    }
+
+    public ResponseEntity<String> getImageJsonById(Long imageID) {
+        Optional<Image> imageOptional = imageRepository.findById(imageID);
+        if (imageOptional.isPresent()) {
+            Image image = imageOptional.get();
+            String json = "{ \"name\": \"" + image.getUserID() + "\", " +
+                    "\"imageId\": \"" + image.getImageID() + "\", " +
+                    "\"tags\": [], " + // 태그는 없으니 빈 배열로
+                    "\"uploadTime\": \"" + image.getUploadTime() + "\" }";
+            return ResponseEntity.ok(json);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

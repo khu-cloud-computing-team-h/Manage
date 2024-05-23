@@ -27,7 +27,7 @@ public class ImageController {
     public ResponseEntity<String> uploadImage(@RequestParam("userID") String userID, @RequestParam("imageFile") MultipartFile imageFile) {
 
         //이미지를 저장할 디렉토리 경로 설정
-        String uploadDir = "C:\\Users\\jhs\\Desktop\\경희대학교\\2024-1학기\\클라우드컴퓨팅\\ccProject\\images\\" + userID + "/";
+        String uploadDir = "C:\\Users\\jhs\\Desktop\\경희대학교\\2024-1학기\\클라우드컴퓨팅\\CloudComputing-project\\images\\" + userID + "/";
         File directory = new File(uploadDir);
 
         if (!directory.exists()) {
@@ -89,5 +89,10 @@ public class ImageController {
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
+    }
+
+    @GetMapping("/api/manage/image-data/{imageID}")
+    public ResponseEntity<String> getImageData(@PathVariable Long imageID) {
+        return imageService.getImageJsonById(imageID);
     }
 }
