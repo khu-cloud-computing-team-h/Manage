@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Service
 public class ImageService {
@@ -21,5 +22,10 @@ public class ImageService {
         image.setUploadTime(new Timestamp(System.currentTimeMillis()));
 
         imageRepository.save(image);
+    }
+
+    public Image getImageById(Long imageID) {
+        Optional<Image> image = imageRepository.findById(imageID);
+        return image.orElse(null);
     }
 }

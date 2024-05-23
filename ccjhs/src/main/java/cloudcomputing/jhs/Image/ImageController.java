@@ -1,11 +1,13 @@
 package cloudcomputing.jhs.Image;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -57,5 +59,35 @@ public class ImageController {
             return ResponseEntity.badRequest().body("Image upload Fail");
         }
         return ResponseEntity.ok("Image upload success");
+    }
+
+    @GetMapping("/api/manage/image/{imageID}")
+    public ResponseEntity<Resource> getImage(@PathVariable("imageID") Long imageID) {
+
+        Image image = imageService.getImageById(imageID);
+
+        if (image == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        File imageFile = new File(image.getS3url());
+
+        if (!imageFile.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
+            Resource resource = new ByteArrayResource(imageBytes);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + imageFile.getName() + "\"")
+                    .contentLength(imageFile.length())
+                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG)  // 적절한 MIME 타입 설정
+                    .body(resource);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 }
