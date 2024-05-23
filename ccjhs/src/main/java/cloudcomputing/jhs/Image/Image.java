@@ -20,7 +20,8 @@ public class Image {
     private BigDecimal userID;
     private String s3url;
 
-    @Transient
+    @CreationTimestamp
+    @Column(name = "uploadtime")
     private Timestamp uploadTime;
 
 }

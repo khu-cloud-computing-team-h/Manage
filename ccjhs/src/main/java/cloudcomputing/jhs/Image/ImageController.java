@@ -40,7 +40,7 @@ public class ImageController {
             //이미지 파일의 확장자 추출
             String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
 
-            //이미지 ID 생성 (현재 시간을 사용하여 고유한 ID 생성)
+            //이미지 ID 생성(현재 시간을 사용하여 고유한 ID 생성)
             Long imageID = System.currentTimeMillis();
             //파일명은 이미지 ID + 확장자로 설정
             String fileName = imageID + fileExtension;
@@ -83,7 +83,7 @@ public class ImageController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + imageFile.getName() + "\"")
                     .contentLength(imageFile.length())
-                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG)  // 적절한 MIME 타입 설정
+                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG)  //적절한 MIME 타입 설정
                     .body(resource);
         } catch (IOException e) {
             e.printStackTrace();
