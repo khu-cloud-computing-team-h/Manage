@@ -54,11 +54,14 @@ public class ImageController {
             BigDecimal userIdBigDecimal = new BigDecimal(userID);
             imageService.saveImage(imageID, userIdBigDecimal, uploadPath.toString());
 
+            //이미지 저장 후 이미지 ID 반환
+            return ResponseEntity.ok().body(imageID.toString());
+
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Image upload Fail");
         }
-        return ResponseEntity.ok("Image upload success");
+
 
     }
 
