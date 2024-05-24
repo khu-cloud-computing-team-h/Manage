@@ -24,14 +24,13 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        String fileUrl = "https://" + bucket + "/test" + fileName;
 
         ObjectMetadata metadata = new ObjectMetadata();
+
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
 
         amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
-
-        return fileUrl;
+        return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 }
