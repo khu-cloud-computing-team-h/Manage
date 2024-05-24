@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -46,6 +49,31 @@ public class ImageService {
         } else {
             //해당 이미지 ID에 대한 이미지가 존재하지 않는 경우
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    public boolean deleteImage(Long imageID) {
+        Optional<Image> optionalImage = imageRepository.findById(imageID);
+
+        if (optionalImage.isPresent()) {
+            Image image = optionalImage.get();
+
+            try {
+                //파일 시스템에서 이미지 삭제
+                Path imagePath = Paths.get(image.getS3url());
+                Files.deleteIfExists(imagePath);
+
+                //데이터베이스에서 이미지 정보 삭제
+                imageRepository.deleteById(imageID);
+
+                return true;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 }

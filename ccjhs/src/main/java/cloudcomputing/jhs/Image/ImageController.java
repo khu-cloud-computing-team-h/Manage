@@ -59,6 +59,7 @@ public class ImageController {
             return ResponseEntity.badRequest().body("Image upload Fail");
         }
         return ResponseEntity.ok("Image upload success");
+
     }
 
     @GetMapping("/api/manage/image/{imageID}")
@@ -94,5 +95,16 @@ public class ImageController {
     @GetMapping("/api/manage/image-data/{imageID}")
     public ResponseEntity<String> getImageData(@PathVariable Long imageID) {
         return imageService.getImageJsonById(imageID);
+    }
+
+    @DeleteMapping("/api/manage/image/{imageID}")
+    public ResponseEntity<String> deleteImage(@PathVariable Long imageID) {
+        boolean isDeleted = imageService.deleteImage(imageID);
+
+        if (isDeleted) {
+            return ResponseEntity.ok("Image delete success");
+        } else {
+            return ResponseEntity.status(404).body("Image not found or failed to delete");
+        }
     }
 }
