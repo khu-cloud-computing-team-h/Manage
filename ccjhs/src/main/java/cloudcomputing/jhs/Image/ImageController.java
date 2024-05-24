@@ -28,18 +28,19 @@ public class ImageController {
     private S3Service s3Service;
 
     @PostMapping("/api/manage/image")
-    public ResponseEntity<String> uploadImage(@RequestParam("userID") String userID, @RequestParam("imageFile") MultipartFile imageFile) {
+    public ResponseEntity<String> uploadImage(@RequestParam("userID") String userID,
+                                              @RequestParam("imageFile") MultipartFile imageFile) {
 
         try {
-            //S3에 이미지 업로드
+            // S3에 이미지 업로드
             String imageUrl = s3Service.uploadFile(imageFile);
 
-            //MySQL에 이미지 정보 저장
+            // MySQL에 이미지 정보 저장
             BigDecimal userIdBigDecimal = new BigDecimal(userID);
-            //imageID는 자동 생성
+            // imageID는 자동 생성됨
             imageService.saveImage(null, userIdBigDecimal, imageUrl);
 
-            //이미지 저장 후 이미지 URL 반환
+            // 이미지 저장 후 이미지 URL 반환
             return ResponseEntity.ok().body("Image upload success. Image URL: " + imageUrl);
 
         } catch (IOException e) {
