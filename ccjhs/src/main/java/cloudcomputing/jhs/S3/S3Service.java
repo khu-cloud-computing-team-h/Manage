@@ -24,7 +24,7 @@ public class S3Service {
 
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
-        String fileUrl = "https://" + bucket + "/test" + fileName;  //실제 저장된 주소는 이게 아닌거 같음, 실제는 객체 URL로 연동되어야 하는 듯?
+        String fileUrl = "https://" + bucket + "/test" + fileName;
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
