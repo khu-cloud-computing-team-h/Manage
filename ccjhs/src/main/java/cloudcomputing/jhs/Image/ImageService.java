@@ -2,6 +2,7 @@ package cloudcomputing.jhs.Image;
 
 import cloudcomputing.jhs.S3.S3Service;
 import com.amazonaws.services.kms.model.NotFoundException;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,6 +91,33 @@ public class ImageService {
             }
         } else {
             return false;
+        }
+    }
+
+    public void updateImageName(Long imageID, String newName) {
+        Optional<Image> optionalImage = imageRepository.findById(imageID);
+
+        if (optionalImage.isPresent()) {
+            Image image = optionalImage.get();
+
+            String oldUrl = image.getS3url();
+
+            String newUrl = oldUrl.substring(0, oldUrl.lastIndexOf("/") + 1) + newName;
+
+            try {
+                s3Service.renameS3Image(oldUrl, newUrl);
+
+                image.setS3url(newUrl);
+
+                imageRepository.save(image);
+
+            } catch (AmazonS3Exception e) {
+                e.printStackTrace();
+
+                throw new RuntimeException("Failed to update image name in S3");
+            }
+        } else {
+            throw new NotFoundException("Image not found with ID: " + imageID);
         }
     }
 }

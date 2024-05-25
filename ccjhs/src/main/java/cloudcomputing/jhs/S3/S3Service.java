@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,5 +81,16 @@ public class S3Service {
             //디코딩 실패 시 기본 키 값 반환
             return key;
         }
+    }
+
+    public void renameS3Image(String oldUrl, String newUrl) {
+        String oldKey = URLDecoder.decode(oldUrl.substring(oldUrl.lastIndexOf(".com/") + 5), StandardCharsets.UTF_8);
+        String newKey = URLDecoder.decode(newUrl.substring(newUrl.lastIndexOf(".com/") + 5), StandardCharsets.UTF_8);
+
+        //새 키 값으로 객체 복사
+        amazonS3Client.copyObject(bucket, oldKey, bucket, newKey);
+
+        //기존 객체 제거
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, oldKey));
     }
 }

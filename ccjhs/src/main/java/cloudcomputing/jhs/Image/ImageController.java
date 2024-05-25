@@ -1,6 +1,7 @@
 package cloudcomputing.jhs.Image;
 
 import cloudcomputing.jhs.S3.S3Service;
+import cloudcomputing.jhs.dto.UpdateImageNameRequest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.apache.coyote.Response;
@@ -75,6 +76,19 @@ public class ImageController {
             return ResponseEntity.ok("Image delete success");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found or failed to delete");
+        }
+    }
+
+    @PatchMapping("/api/manage/image/{imageID}/name")
+    public ResponseEntity<String> updateImageName(@PathVariable Long imageID, @RequestBody UpdateImageNameRequest request) {
+        try {
+            imageService.updateImageName(imageID, request.getName());
+
+            return ResponseEntity.ok("Image name update success");
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update Image name");
         }
     }
 }
