@@ -1,5 +1,6 @@
 package cloudcomputing.jhs.Image;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,15 @@ public class ImageService {
         image.setS3url(uploadPath);
 
         imageRepository.save(image);
+    }
+
+    public String getS3UrlByImageId(Long imageId) {
+        //이미지 ID로 이미지를 데이터베이스에서 찾기
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new NotFoundException("Image not found with ID: " + imageId));
+
+        //이미지의 S3 URL을 반환
+        return image.getS3url();
     }
 
     public Image getImageById(Long imageID) {

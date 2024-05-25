@@ -7,12 +7,15 @@ import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Member;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,32 +49,15 @@ public class ImageController {
     }
 
     @GetMapping("/api/manage/image/{imageID}")
-    public ResponseEntity<Resource> getImage(@PathVariable("imageID") Long imageID) {
-
-        Image image = imageService.getImageById(imageID);
-
-        if (image == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        File imageFile = new File(image.getS3url());
-
-        if (!imageFile.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<String> getImage(@PathVariable("imageID") Long imageID) {
         try {
-            byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
-            Resource resource = new ByteArrayResource(imageBytes);
+            // 이미지 ID를 사용하여 S3 URL을 가져오기
+            String imageUrl = imageService.getS3UrlByImageId(imageID);
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + imageFile.getName() + "\"")
-                    .contentLength(imageFile.length())
-                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG)  //적절한 MIME 타입 설정
-                    .body(resource);
-        } catch (IOException e) {
+            return ResponseEntity.ok(imageUrl);
+        } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image not found. ImageID: " + imageID);
         }
     }
 
