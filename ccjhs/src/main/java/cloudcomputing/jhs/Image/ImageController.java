@@ -68,12 +68,13 @@ public class ImageController {
 
     @DeleteMapping("/api/manage/image/{imageID}")
     public ResponseEntity<String> deleteImage(@PathVariable Long imageID) {
+        // 이미지 삭제
         boolean isDeleted = imageService.deleteImage(imageID);
 
         if (isDeleted) {
             return ResponseEntity.ok("Image delete success");
         } else {
-            return ResponseEntity.status(404).body("Image not found or failed to delete");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found or failed to delete");
         }
     }
 }

@@ -1,5 +1,6 @@
 package cloudcomputing.jhs.Image;
 
+import cloudcomputing.jhs.S3.S3Service;
 import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,9 @@ public class ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
+
+    @Autowired
+    private S3Service s3Service;
 
     public void saveImage(Long imageID, BigDecimal userID, String uploadPath) {
         Image image = new Image();
@@ -72,9 +76,8 @@ public class ImageService {
             Image image = optionalImage.get();
 
             try {
-                //파일 시스템에서 이미지 삭제
-                Path imagePath = Paths.get(image.getS3url());
-                Files.deleteIfExists(imagePath);
+                //S3에서 이미지 삭제
+                s3Service.deleteS3Image(image.getS3url());
 
                 //데이터베이스에서 이미지 정보 삭제
                 imageRepository.deleteById(imageID);
