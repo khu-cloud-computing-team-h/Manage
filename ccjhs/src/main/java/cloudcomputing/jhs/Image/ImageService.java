@@ -2,6 +2,7 @@ package cloudcomputing.jhs.Image;
 
 import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,21 +45,23 @@ public class ImageService {
 
     public ResponseEntity<String> getImageJsonById(Long imageID) {
         //이미지 ID로 이미지 정보를 데이터베이스에서 조회
-        Image image = imageRepository.findById(imageID).orElse(null);
+        Optional<Image> imageOptional = imageRepository.findById(imageID);
 
-        if (image != null) {
+        if (imageOptional.isPresent()) {
+            Image image = imageOptional.get();
+
             //이미지 정보를 JSON 형식으로 변환하여 응답
             String json = "{ " +
-                    "\"name\": \"" + image.getUserID() + "\", " +
-                    "\"imageId\": \"" + image.getImageID() + "\", " +
-                    "\"tags\": [], " + //아직 태그 생성 로직이 없으므로 빈 배열을 사용
-                    "\"uploadTime\": \"" + image.getUploadTime() + "\" " +
+                    "\"UserID\": \"" + image.getUserID() + "\", " +
+                    "\"ImageID\": \"" + image.getImageID() + "\", " +
+                    "\"Tags\": [], " + //태그 생성 로직이 없으므로 빈 배열을 사용
+                    "\"UploadTime\": \"" + image.getUploadTime() + "\" " +
                     "}";
 
             return ResponseEntity.ok(json);
         } else {
             //해당 이미지 ID에 대한 이미지가 존재하지 않는 경우
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image info not found");
         }
     }
 
