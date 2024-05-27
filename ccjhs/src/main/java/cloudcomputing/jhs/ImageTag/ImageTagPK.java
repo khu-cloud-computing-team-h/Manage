@@ -19,4 +19,12 @@ public class ImageTagPK implements Serializable {
 
     @Column(name = "ImageID")
     private Long imageID;
+
+    public void setImageID(Long imageID) {
+        this.imageID = imageID;
+    }
+
+    public void setTagID(Long tagID) {
+        this.tagID = tagID;
+    }
 }
