@@ -3,17 +3,28 @@ package cloudcomputing.jhs.ImageTag;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
+
 @Entity(name = "ImageTag")
 public class ImageTag {
 
-    public record PK(Long TagID, Long ImageID) implements Serializable{
+    @EmbeddedId
+    private ImageTagPK pk;
 
+    public ImageTag() {}
+
+    public ImageTag(Long tagID, Long imageID) {
+        this.pk = new ImageTagPK(tagID, imageID);
     }
 
-    @EmbeddedId
-    private PK pk;
+    public ImageTagPK getPk() {
+        return pk;
+    }
+
+    public void setPk(ImageTagPK pk) {
+        this.pk = pk;
+    }
 }
