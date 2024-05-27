@@ -1,5 +1,6 @@
 package cloudcomputing.jhs.ImageTag;
 
+import cloudcomputing.jhs.Image.ImageService;
 import cloudcomputing.jhs.Tag.Tag;
 import cloudcomputing.jhs.Tag.TagService;
 import cloudcomputing.jhs.UploadImageTagsRequest;
@@ -23,11 +24,20 @@ public class ImageTagController {
     @Autowired
     private ImageTagService imageTagService;
 
+    @Autowired
+    private ImageService imageService;
+
+
     @PostMapping
     public ResponseEntity<String> uploadImageTags(@RequestBody UploadImageTagsRequest request){
         try {
             Long imageId = request.getImageId();
             List<String> tags = request.getTags();
+
+            //이미지 ID의 존재 여부 확인
+            if (!imageService.existsById(imageId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image ID not found." + "Image ID = "+ imageId);
+            }
 
             for(String tagName : tags){
                 //이미 존재하는 태그인지 확인

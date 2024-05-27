@@ -120,4 +120,11 @@ public class ImageService {
             throw new NotFoundException("Image not found with ID: " + imageID);
         }
     }
+
+    //이미지가 존재하는지 확인하는 메서드
+    public boolean existsById(Long imageId) {
+        Optional<Image> imageOptional = imageRepository.findById(imageId);
+
+        return imageOptional.isPresent();
+    }
 }
