@@ -35,25 +35,6 @@ public class ImageController {
     @Autowired
     private S3Service s3Service;
 
-    // 사용자 토큰 사용하기 전의 기존 코드
-//    @PostMapping("/api/manage/image")
-//    public ResponseEntity<String> uploadImage(@RequestParam("userID") String userID, @RequestParam("imageFile") MultipartFile imageFile) {
-//        try {
-//            //S3에 이미지 업로드
-//            String imageUrl = s3Service.uploadFile(imageFile);
-//
-//            //MySQL에 이미지 정보 저장
-//            BigDecimal userIdBigDecimal = new BigDecimal(userID);
-//            imageService.saveImage(null, userIdBigDecimal, imageUrl);
-//
-//            //이미지 저장 후 이미지 URL 반환
-//            return ResponseEntity.ok().body("Image upload success. Image URL: " + imageUrl);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.badRequest().body("Image upload Fail");
-//        }
-//    }
-
     //토큰을 사용해 UserID를 가져와서 Image를 post하는 코드
     @PostMapping("/api/manage/image")
     public ResponseEntity<String> uploadImage(HttpServletRequest request, @RequestParam("imageFile") MultipartFile imageFile) {
