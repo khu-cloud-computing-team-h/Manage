@@ -1,6 +1,9 @@
 package cloudcomputing.jhs.Image;
 
+import cloudcomputing.jhs.ImageTag.ImageTagRepository;
 import cloudcomputing.jhs.S3.S3Service;
+import cloudcomputing.jhs.Tag.Tag;
+import cloudcomputing.jhs.Tag.TagRepository;
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.yaml.snakeyaml.tokens.Token.ID.Tag;
 
 @Service
 public class ImageService {
@@ -23,6 +31,12 @@ public class ImageService {
 
     @Autowired
     private S3Service s3Service;
+
+    @Autowired
+    private ImageTagRepository imageTagRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
     public void saveImage(Long imageID, BigDecimal userID, String uploadPath) {
         Image image = new Image();
@@ -59,7 +73,7 @@ public class ImageService {
             String json = "{ " +
                     "\"UserID\": \"" + image.getUserID() + "\", " +
                     "\"ImageID\": \"" + image.getImageID() + "\", " +
-                    "\"Tags\": [], " + //태그 생성 로직이 없으므로 빈 배열을 사용
+                    "\"Tags\": " + getTagsJsonByImageId(imageID) + ", " +
                     "\"UploadTime\": \"" + image.getUploadTime() + "\" " +
                     "}";
 
@@ -68,6 +82,18 @@ public class ImageService {
             //해당 이미지 ID에 대한 이미지가 존재하지 않는 경우
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image info not found");
         }
+    }
+
+    private String getTagsJsonByImageId(Long imageId) {
+        // 이미지 ID로 이미지에 속한 태그들을 조회하여 JSON 배열 형태로 반환
+        List<String> tags = imageTagRepository.findAllByPkImageID(imageId)
+                .stream()
+                .map(imageTag -> tagRepository.findById(imageTag.getPk().getTagID()).orElse(null))
+                .filter(Objects::nonNull)
+                .map(cloudcomputing.jhs.Tag.Tag::getTagName)
+                .collect(Collectors.toList());
+
+        return "[" + String.join(", ", tags) + "]";
     }
 
     public boolean deleteImage(Long imageID) {
