@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @RestController
 public class ImageController {
@@ -49,7 +50,7 @@ public class ImageController {
             imageService.saveImage(null, userIdBigDecimal, imageUrl);
 
             //이미지 저장 후 이미지 URL 반환
-            return ResponseEntity.ok().body("Image upload success. Image URL: " + imageUrl);
+            return ResponseEntity.ok().body("Image upload success.");
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -66,7 +67,22 @@ public class ImageController {
             return ResponseEntity.ok(imageUrl);
         } catch (Exception e) {
             e.printStackTrace();
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image not found. ImageID: " + imageID);
+        }
+    }
+
+    @GetMapping("/api/manage/image")
+    public ResponseEntity<?> getAllImages(HttpServletRequest request) {
+        try {
+            BigDecimal userId = (BigDecimal) request.getAttribute("userId");
+            List<String> imageUrls = imageService.getAllImageUrls(userId);
+
+            return ResponseEntity.ok(imageUrls);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Images not found.");
         }
     }
 
