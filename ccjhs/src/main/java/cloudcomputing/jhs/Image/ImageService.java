@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -152,5 +153,16 @@ public class ImageService {
         Optional<Image> imageOptional = imageRepository.findById(imageId);
 
         return imageOptional.isPresent();
+    }
+
+    public List<String> getAllImageUrls(BigDecimal userId) {
+        List<Image> images = imageRepository.findByUserID(userId);
+        List<String> imageUrls = new ArrayList<>();
+
+        for (Image image : images) {
+            String imageUrl = image.getS3url();
+            imageUrls.add(imageUrl);
+        }
+        return imageUrls;
     }
 }
