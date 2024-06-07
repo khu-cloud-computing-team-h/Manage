@@ -49,7 +49,7 @@ public class ImageController {
             imageService.saveImage(null, userIdBigDecimal, imageUrl);
 
             //이미지 저장 후 이미지 URL 반환
-            return ResponseEntity.ok().body("Image upload success. Image URL: " + imageUrl);
+            return ResponseEntity.ok().body("Image upload success.");
         } catch (IOException e) {
             e.printStackTrace();
 
