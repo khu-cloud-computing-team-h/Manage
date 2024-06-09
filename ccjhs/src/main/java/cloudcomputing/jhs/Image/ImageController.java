@@ -46,11 +46,11 @@ public class ImageController {
             //S3에 이미지 업로드
             String imageUrl = s3Service.uploadFile(imageFile);
 
-            //MySQL에 이미지 정보 저장
-            imageService.saveImage(null, userIdBigDecimal, imageUrl);
+            //MySQL에 이미지 정보 저장 및 저장된 이미지 정보 반환
+            Image savedImage = imageService.saveImage(userIdBigDecimal, imageUrl);
 
-            //이미지 저장 후 이미지 URL 반환
-            return ResponseEntity.ok().body("Image upload success.");
+            //이미지 저장 후 이미지 ID 반환
+            return ResponseEntity.ok().body("Image Upload Success. ImageID = " + savedImage.getImageID());
         } catch (IOException e) {
             e.printStackTrace();
 

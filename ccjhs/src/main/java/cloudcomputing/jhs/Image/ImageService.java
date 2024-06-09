@@ -39,14 +39,13 @@ public class ImageService {
     @Autowired
     private TagRepository tagRepository;
 
-    public void saveImage(Long imageID, BigDecimal userID, String uploadPath) {
+    public Image saveImage(BigDecimal userID, String uploadPath) {
         Image image = new Image();
 
-        image.setImageID(imageID);
         image.setUserID(userID);
         image.setS3url(uploadPath);
 
-        imageRepository.save(image);
+        return imageRepository.save(image);
     }
 
     public String getS3UrlByImageId(Long imageId) {
