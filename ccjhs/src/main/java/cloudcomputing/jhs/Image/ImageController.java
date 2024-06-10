@@ -103,6 +103,17 @@ public class ImageController {
         }
     }
 
+    @GetMapping("/api/manage/image-data")
+    public ResponseEntity<?> getImageData(HttpServletRequest request, @RequestParam(required = false) Long imageID) {
+        if (imageID != null) {
+            return imageService.getImageJsonById(imageID);
+        } else {
+            BigDecimal userId = (BigDecimal) request.getAttribute("userId");
+
+            return imageService.getAllImagesJsonByUserId(userId);
+        }
+    }
+
     @PatchMapping("/api/manage/image/{imageID}/name")
     public ResponseEntity<String> updateImageName(@PathVariable Long imageID, @RequestBody UpdateImageNameRequest request) {
         try {

@@ -84,6 +84,32 @@ public class ImageService {
         }
     }
 
+    public ResponseEntity<String> getAllImagesJsonByUserId(BigDecimal userID) {
+        List<Image> images = imageRepository.findByUserID(userID);
+
+        if (images.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Images info not found.");
+        }
+
+        StringBuilder jsonBuilder = new StringBuilder();
+
+        for (Image image : images) {
+            String json = "{ " +
+                    "\"UserID\": \"" + image.getUserID() + "\", " +
+                    "\"ImageID\": \"" + image.getImageID() + "\", " +
+                    "\"Tags\": " + getTagsJsonByImageId(image.getImageID()) + ", " +
+                    "\"UploadTime\": \"" + image.getUploadTime() + "\" " +
+                    "  },\n";
+            jsonBuilder.append(json);
+        }
+
+        //Remove the trailing comma and newline
+        if (jsonBuilder.length() > 2) {
+            jsonBuilder.setLength(jsonBuilder.length() - 2);
+        }
+        return ResponseEntity.ok(jsonBuilder.toString());
+    }
+
     private String getTagsJsonByImageId(Long imageId) {
         // 이미지 ID로 이미지에 속한 태그들을 조회하여 JSON 배열 형태로 반환
         List<String> tags = imageTagRepository.findAllByPkImageID(imageId)
