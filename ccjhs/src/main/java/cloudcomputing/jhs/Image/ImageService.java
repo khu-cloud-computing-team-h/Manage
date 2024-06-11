@@ -16,10 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.yaml.snakeyaml.tokens.Token.ID.Tag;
@@ -84,42 +81,42 @@ public class ImageService {
         }
     }
 
-    public ResponseEntity<String> getAllImagesJsonByUserId(BigDecimal userID) {
+    public ResponseEntity<Map<String, List<Map<String, Object>>>> getAllImagesJsonByUserId(BigDecimal userID) {
         List<Image> images = imageRepository.findByUserID(userID);
 
         if (images.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("Image info is empty.");
+            return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap("results", Collections.emptyList()));
         }
 
-        StringBuilder jsonBuilder = new StringBuilder();
+        List<Map<String, Object>> results = new ArrayList<>();
 
         for (Image image : images) {
-            String json = "{ " +
-                    "\"UserID\": \"" + image.getUserID() + "\", " +
-                    "\"ImageID\": \"" + image.getImageID() + "\", " +
-                    "\"Tags\": " + getTagsJsonByImageId(image.getImageID()) + ", " +
-                    "\"UploadTime\": \"" + image.getUploadTime() + "\" " +
-                    "  },\n";
-            jsonBuilder.append(json);
+            Map<String, Object> jsonMap = new HashMap<>();
+
+            jsonMap.put("UserID", image.getUserID());
+            jsonMap.put("ImageID", image.getImageID());
+            jsonMap.put("Tags", getTagsJsonByImageId(image.getImageID()));
+            jsonMap.put("UploadTime", image.getUploadTime());
+
+            results.add(jsonMap);
         }
 
-        //Remove the trailing comma and newline
-        if (jsonBuilder.length() > 2) {
-            jsonBuilder.setLength(jsonBuilder.length() - 2);
-        }
-        return ResponseEntity.ok(jsonBuilder.toString());
+        Map<String, List<Map<String, Object>>> response = new HashMap<>();
+
+        response.put("results", results);
+
+        return ResponseEntity.ok(response);
     }
 
-    private String getTagsJsonByImageId(Long imageId) {
+    private List<String> getTagsJsonByImageId(Long imageId) {
         // 이미지 ID로 이미지에 속한 태그들을 조회하여 JSON 배열 형태로 반환
-        List<String> tags = imageTagRepository.findAllByPkImageID(imageId)
+
+        return imageTagRepository.findAllByPkImageID(imageId)
                 .stream()
                 .map(imageTag -> tagRepository.findById(imageTag.getPk().getTagID()).orElse(null))
                 .filter(Objects::nonNull)
                 .map(cloudcomputing.jhs.Tag.Tag::getTagName)
                 .collect(Collectors.toList());
-
-        return "[" + String.join(", ", tags) + "]";
     }
 
     public boolean deleteImage(Long imageID) {
