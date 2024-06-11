@@ -88,7 +88,7 @@ public class ImageService {
         List<Image> images = imageRepository.findByUserID(userID);
 
         if (images.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Images info not found.");
+            return ResponseEntity.status(HttpStatus.OK).body("Image info is empty.");
         }
 
         StringBuilder jsonBuilder = new StringBuilder();
